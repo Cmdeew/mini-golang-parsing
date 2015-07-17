@@ -27,7 +27,7 @@ type Video 	struct {
 }
 
 func init() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/home", handler)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +53,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprint(w, "\n!!!!!!!!!! DEBUG !!!!!!!!!!!!!!!!\n")
-	for i, track := range data.List{
-		fmt.Fprint(w, track.Title + "-", i)
-	}
+	fmt.Fprint(w, data)
+	/*for i, track := range data.List{
+		fmt.Fprint(w, track.Id, i)
+	}*/
 }
