@@ -1,3 +1,7 @@
+/*	
+	Author: Thomas Rieux-Laucat
+*/
+
 package hello
 
 import (
@@ -30,9 +34,15 @@ func init() {
 	http.HandleFunc("/home", handler)
 }
 
+func guestbookKey(c appengine.Context) *datastore.Key {
+        // The string "default_guestbook" here could be varied to have multiple guestbooks.
+        return datastore.NewKey(c, "Video", "Video", 0, nil)
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello World ! Let's start\n\n")
 
+	//Get
 	url := "https://api.dailymotion.com/channel/music/videos"
 	c := appengine.NewContext(r)
 	client := urlfetch.Client(c)
@@ -40,8 +50,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		panic(err.Error())
 	}
+	//Read
 	body, err := ioutil.ReadAll(res.Body)
-	fmt.Fprint(w, string(body))
 	if err != nil{
 		panic(err.Error())
 	}
@@ -51,10 +61,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		panic(err.Error())
 	}
-
-	fmt.Fprint(w, "\n!!!!!!!!!! DEBUG !!!!!!!!!!!!!!!!\n")
-	fmt.Fprint(w, data)
-	/*for i, track := range data.List{
-		fmt.Fprint(w, track.Id, i)
-	}*/
+	//write
+	fmt.Fprint(w, data.List)
+	for track := range data.List{
+	    v := Video{
+	            Id: track.Id,
+	            Title: track.Title,
+	            Channel: track.Channel,
+	            Owner: track.Owner,
+	    }	
+	    key := datastore.NewIncompleteKey(c, "Video", guestbookKey(c))
+	    _, err := datastore.Put(c, key, &v)
+	    if err != nil {
+	            http.Error(w, err.Error(), http.StatusInternalServerError)
+	            return
+	    }
+	    http.Redirect(w, r, "/", http.StatusFound)	
+	}
 }
