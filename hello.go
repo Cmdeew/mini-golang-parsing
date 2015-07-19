@@ -79,8 +79,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		//DEBUG
 		e2 := new(Video)
 		if err = datastore.Get(c, k, e2); err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
+        	http.Error(w, err.Error(), http.StatusInternalServerError)
+        	return
     	}
 
     	fmt.Fprintf(w, "Video Title %q", e2.Title)
