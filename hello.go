@@ -84,7 +84,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
     	}
 
     	fmt.Fprintf(w, "Video Title %q", e2.Title)
-		fmt.Fprint(w, track.Title, i)
 		fmt.Fprint(w, "\n")
 	}
 }
