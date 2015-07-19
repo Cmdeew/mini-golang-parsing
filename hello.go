@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"appengine"
+	"appengine/datastore"
 	"appengine/urlfetch"
 
 )
@@ -56,9 +57,26 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		panic(err.Error())
 	}
-	//write
-	fmt.Fprint(w, data.List)
-	/*for i, track := range data.List{
-		fmt.Fprint(w, track.Id, i)
-	}*/
+	//stack
+	k := datastore.NewIncompleteKey(c, "Video", nil)
+	e := new(Video)
+	if err := datastore.Get(c, k, e); err != nil{
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for i, track := range data.List{
+		e := Video{
+			Id: 		track.Id,
+			Title:		track.Title,
+			Channel:	track.Channel,
+			Owner:		track.Owner,
+		}
+		if _, err := datastore.Put(c, k, e); err != nil{
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		//DEBUG
+		fmt.Fprint(w, track.Title, i)
+		fmt.Fprint(w, "\n")
+	}
 }
