@@ -58,24 +58,32 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 	//stack
-	k := datastore.NewIncompleteKey(c, "Video", nil)
-	e := new(Video)
-	if err := datastore.Get(c, k, e); err != nil{
+	k := datastore.NewKey(c, "Video", "stringID", 0, nil)
+	/*e := new(Video)*/
+	/*if err := datastore.Get(c, k, e); err != nil{
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		fmt.Fprint(w, "ouais frere c'est la")
 		return
-	}
-	for i, track := range data.List{
+	}*/
+	for i, track := range data.List {
 		e := Video{
 			Id: 		track.Id,
 			Title:		track.Title,
 			Channel:	track.Channel,
 			Owner:		track.Owner,
 		}
-		if _, err := datastore.Put(c, k, e); err != nil{
+		if _, err := datastore.Put(c, k, &e); err != nil{
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		//DEBUG
+		e2 := new(Video)
+		if err = datastore.Get(c, k, e2); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    	}
+
+    	fmt.Fprintf(w, "Video Title %q", e2.Title)
 		fmt.Fprint(w, track.Title, i)
 		fmt.Fprint(w, "\n")
 	}
