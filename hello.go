@@ -82,8 +82,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
         	http.Error(w, err.Error(), http.StatusInternalServerError)
         	return
     	}
-
+    	//Debug
     	fmt.Fprintf(w, "Video Title %q", e2.Title)
 		fmt.Fprint(w, "\n")
+		i++
 	}
 }
