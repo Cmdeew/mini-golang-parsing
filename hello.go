@@ -1,4 +1,4 @@
-/*	
+/*
 	Author: Thomas Rieux-Laucat
 */
 
@@ -6,12 +6,13 @@ package hello
 
 import (
 	"fmt"
+	"os"
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
 	"appengine"
 	"appengine/datastore"
-	"appengine/urlfetch"
+	//"appengine/urlfetch"
 
 )
 
@@ -39,15 +40,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello World ! Let's start\n\n")
 
 	//Getter
-	url := "https://api.dailymotion.com/channel/music/videos"
+	//url := "https://api.dailymotion.com/channel/music/videos"
 	c := appengine.NewContext(r)
-	client := urlfetch.Client(c)
-	res, err := client.Get(url)
-	if err != nil{
+	//client := urlfetch.Client(c)
+	//res, err := client.Get(url)
+	/*if err != nil{
 		panic(err.Error())
-	}
+	}*/
+	//local
+	file, err := os.Open("data.json")
 	//Read
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(file) //res.Body / file -> travail local
 	if err != nil{
 		panic(err.Error())
 	}
@@ -57,34 +60,31 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil{
 		panic(err.Error())
 	}
-	//stack
-	k := datastore.NewKey(c, "Video", "stringID", 0, nil)
-	/*e := new(Video)*/
-	/*if err := datastore.Get(c, k, e); err != nil{
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Fprint(w, "ouais frere c'est la")
-		return
-	}*/
-	for i, track := range data.List {
+
+	for i , track := range data.List {
+	k := datastore.NewKey(c, "Video", track.Id, 0, nil)
+
 		e := Video{
 			Id: 		track.Id,
 			Title:		track.Title,
 			Channel:	track.Channel,
 			Owner:		track.Owner,
 		}
+		fmt.Fprint(w, "##--->KEY : ", k)
+		fmt.Fprint(w, "\n")
+		fmt.Fprintf(w, "Envoi de: ID: [%q], Title: [%q]", e.Id, e.Title)
+		fmt.Fprint(w, "\n")
 		if _, err := datastore.Put(c, k, &e); err != nil{
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		//DEBUG
-		e2 := new(Video)
+		/*e2 := new(Video)
 		if err = datastore.Get(c, k, e2); err != nil {
         	http.Error(w, err.Error(), http.StatusInternalServerError)
         	return
     	}
-    	//Debug
-    	fmt.Fprintf(w, "Video Title %q", e2.Title)
-		fmt.Fprint(w, "\n")
-		i++
+    	*/
+    	i++
 	}
 }
