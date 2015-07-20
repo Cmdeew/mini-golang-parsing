@@ -30,6 +30,7 @@ type Video 	struct {
 	Title 	string `json:"title"`
 	Channel string `json:"channel"`
 	Owner 	string `json:"owner"`
+	Like	int
 }
 
 func init() {
@@ -69,6 +70,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			Title:		track.Title,
 			Channel:	track.Channel,
 			Owner:		track.Owner,
+			Like:		0,
 		}
 		fmt.Fprint(w, "##--->KEY : ", k)
 		fmt.Fprint(w, "\n")
